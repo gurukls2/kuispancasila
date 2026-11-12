@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUICK BRAIN – LOMBA CERDAS CERMAT PANCASILA (Kelas 2 SD)</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;600;800&family=Mali:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- MediaPipe Hands & Camera Utils -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <style>
+        * {
+            font-family: 'Fredoka', cursive, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .font-outfit {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .font-handwritten {
+            font-family: 'Mali', cursive;
+        }
+
+        /* Bright School Stage Background */
+        body {
+            background: #38bdf8;
+            background-image: 
+                radial-gradient(circle at 50% 20%, #7dd3fc 0%, #38bdf8 60%, #0284c7 100%),
+                radial-gradient(circle at 10% 90%, rgba(253, 224, 71, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(244, 63, 94, 0.4) 0%, transparent 40%);
+            color: #1e293b;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Bunting Flags Decoration */
+        .bunting-banner {
+            background-image: repeating-linear-gradient(45deg, #f43f5e 0 15px, #facc15 15px 30px, #10b981 30px 45px, #06b6d4 45px 60px, #a855f7 60px 75px);
+            height: 12px;
+        }
+
+        /* Festive 3D Buttons & Cards */
+        .card-stage {
+            background: #ffffff;
+            box-shadow: 0 12px 0 0 #0284c7, 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            border: 4px solid #38bdf8;
+        }
+
+        .board-wooden {
+            background: linear-gradient(135deg, #fef08a 0%, #fef3c7 100%);
+            border: 6px solid #f59e0b;
+            box-shadow: 0 10px 0 0 #d97706, 0 15px 20px rgba(0,0,0,0.15);
+        }
+
+        /* 3D Quiz Bell Option Buttons */
+        .opt-card {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            top: 0;
+        }
+        
+        .opt-card-a {
+            background: linear-gradient(180deg, #ff6b6b 0%, #ee5253 100%);
+            box-shadow: 0 8px 0 0 #c8d6e5, 0 8px 0 0 #ff3838, 0 15px 20px rgba(238, 82, 83, 0.4);
+            border: 4px solid #fff;
+        }
+        
+        .opt-card-b {
+            background: linear-gradient(180deg, #feca57 0%, #ff9f43 100%);
+            box-shadow: 0 8px 0 0 #c8d6e5, 0 8px 0 0 #ee5253, 0 15px 20px rgba(255, 159, 67, 0.4);
+            border: 4px solid #fff;
+        }
+
+        .opt-card-c {
+            background: linear-gradient(180deg, #1dd1a1 0%, #10ac84 100%);
+            box-shadow: 0 8px 0 0 #c8d6e5, 0 8px 0 0 #10ac84, 0 15px 20px rgba(16, 172, 132, 0.4);
+            border: 4px solid #fff;
+        }
+
+        .opt-card:hover, .opt-card.hovered {
+            top: -4px;
+            filter: brightness(1.08);
+        }
+
+        .opt-card:active {
+            top: 4px;
+            box-shadow: 0 2px 0 0 #1e293b !important;
+        }
+
+        /* Hand Pointer for Gesture */
+        .hand-cursor {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.15s ease, height 0.15s ease;
+        }
+
+        .pinch-progress-ring {
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-12px); }
+            40%, 80% { transform: translateX(12px); }
+        }
+
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .animate-bounce-gentle {
+            animation: bounce-gentle 2s infinite ease-in-out;
+        }
+
+        /* Treasury Chest Animation */
+        @keyframes chestOpen {
+            0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.15) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .chest-anim {
+            animation: chestOpen 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes floatItem {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+        }
+
+        .floating-treasure {
+            animation: floatItem 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="flex flex-col justify-between min-h-screen relative">
+
+    <!-- Bunting Flag Top Banner -->
+    <div class="bunting-banner w-full"></div>
+
+    <!-- Hand Cursor Visualizer (Gesture Mode) -->
+    <div id="handCursor" class="hand-cursor hidden flex items-center justify-center">
+        <div id="cursorRing" class="w-14 h-14 rounded-full border-4 border-yellow-300 bg-red-500/80 flex items-center justify-center shadow-xl">
+            <i class="fa-solid fa-hand-pointer text-yellow-300 text-xl"></i>
+        </div>
+        <!-- Progress Pinch Circle -->
+        <svg class="absolute w-20 h-20 pointer-events-none" viewBox="0 0 36 36">
+            <path
+                class="text-white/40"
+                stroke-width="4"
+                stroke="currentColor"
+                fill="none"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <path
+                id="pinchProgressPath"
+                class="text-yellow-300 pinch-progress-ring"
+                stroke-width="4"
+                stroke-dasharray="100, 100"
+                stroke-dashoffset="100"
+                stroke-linecap="round"
+                stroke="currentColor"
+                fill="none"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+        </svg>
+    </div>
+
+    <!-- Hidden Video for MediaPipe -->
+    <video id="webcamVideo" class="hidden" playsinline></video>
+
+    <!-- Header Stage Bar -->
+    <header class="w-full px-6 py-3 flex justify-between items-center bg-white/95 backdrop-blur-md border-b-4 border-amber-400 shadow-md relative z-30">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-500 via-yellow-400 to-amber-500 flex items-center justify-center text-white font-bold text-2xl shadow-lg border-2 border-white animate-bounce-gentle">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-3xl font-black tracking-wide text-red-600 drop-shadow-sm">
+                    LOMBA CERDAS CERMAT <span class="text-amber-500">PANCASILA</span>
+                </h1>
+                <p class="text-xs text-sky-700 font-bold tracking-wider">QUICK BRAIN • PANGGUNG PINTAR KELAS 2 SD</p>
+            </div>
+        </div>
+
+        <!-- Audio & Camera Switcher -->
+        <div class="flex items-center space-x-3">
+            <div id="camStatusBadge" class="hidden md:flex items-center px-3 py-1.5 rounded-full bg-sky-100 border-2 border-sky-300 text-xs font-bold text-sky-800">
+                <span id="camStatusDot" class="w-2.5 h-2.5 rounded-full bg-slate-400 mr-2"></span>
+                <span id="camStatusText">Kamera Off</span>
+            </div>
+
+            <button id="btnToggleAudio" onclick="toggleAudio()" class="w-11 h-11 rounded-2xl bg-amber-400 border-2 border-amber-500 flex items-center justify-center text-slate-900 font-bold text-lg hover:bg-amber-300 shadow-md transition">
+                <i id="audioIcon" class="fa-solid fa-volume-high"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN STAGE CONTAINER -->
+    <main class="flex-grow flex items-center justify-center p-4 relative z-10">
+
+        <!-- ================= SCREEN 1: WELCOME & SETUP ================= -->
+        <section id="screenWelcome" class="w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 border-4 border-sky-400 shadow-2xl my-auto text-center relative overflow-hidden">
+            <!-- Stage Balloons Decoration -->
+            <div class="absolute -top-6 -left-6 text-red-400 text-5xl opacity-80"><i class="fa-solid fa-balloon"></i></div>
+            <div class="absolute -top-6 -right-6 text-yellow-400 text-5xl opacity-80"><i class="fa-solid fa-balloon"></i></div>
+
+            <span class="inline-block px-4 py-1.5 rounded-full bg-yellow-100 border-2 border-yellow-400 text-amber-800 text-xs font-black tracking-widest uppercase mb-3 shadow-sm">
+                ⭐ Lomba Cerdas Cermat Resmi SD ⭐
+            </span>
+            <h2 class="text-3xl md:text-5xl font-black mb-3 text-sky-900 tracking-wide leading-tight">
+                Selamat Datang di <br><span class="text-red-500 drop-shadow">Panggung Otak Kilat!</span>
+            </h2>
+            <p class="text-slate-600 text-sm md:text-base font-semibold max-w-lg mx-auto mb-6">
+                Ayo rebut gelar <strong class="text-amber-600">Juara Cerdas Cermat Pancasila</strong>! Selesaikan 5 Level Tantangan dan kumpulkan semua Harta Karun Sekolah!
+            </p>
+
+            <form onsubmit="startGame(event)" class="space-y-6 text-left">
+                <!-- Input Nama -->
+                <div>
+                    <label class="block text-sky-900 text-sm font-black mb-2" for="playerName">
+                        <i class="fa-solid fa-id-card text-red-500 mr-2"></i>Nama Lengkap Peserta Lomba:
+                    </label>
+                    <input type="text" id="playerName" required placeholder="Ketik namamu di sini..." 
+                           class="w-full px-5 py-4 rounded-2xl bg-sky-50 border-4 border-sky-300 text-slate-800 font-bold placeholder-slate-400 focus:outline-none focus:border-amber-400 focus:bg-white text-lg transition shadow-inner">
+                </div>
+
+                <!-- Mode Kontrol -->
+                <div>
+                    <label class="block text-sky-900 text-sm font-black mb-3">
+                        <i class="fa-solid fa-gamepad text-amber-500 mr-2"></i>Pilih Alat Tombol Jawab:
+                    </label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Mode Touch/Mouse -->
+                        <label class="relative flex flex-col p-4 rounded-2xl bg-amber-50 border-4 border-amber-300 cursor-pointer hover:bg-amber-100 transition group shadow-sm">
+                            <input type="radio" name="controlMode" value="touch" checked class="peer hidden">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-black text-lg text-amber-900 group-hover:text-amber-700">Mouse / Sentuh Layar</span>
+                                <i class="fa-solid fa-hand-pointer text-amber-500 text-2xl"></i>
+                            </div>
+                            <p class="text-xs text-amber-800 font-semibold">Klik / Tap langsung tombol bel di layar. Sangat cepat & mudah!</p>
+                            <div class="absolute inset-0 rounded-2xl border-4 border-red-500 opacity-0 peer-checked:opacity-100 pointer-events-none transition"></div>
+                        </label>
+
+                        <!-- Mode Gesture Kamera -->
+                        <label class="relative flex flex-col p-4 rounded-2xl bg-sky-50 border-4 border-sky-300 cursor-pointer hover:bg-sky-100 transition group shadow-sm">
+                            <input type="radio" name="controlMode" value="gesture" class="peer hidden">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-black text-lg text-sky-900 group-hover:text-sky-700">Sensor Tangan Kamera</span>
+                                <i class="fa-solid fa-camera text-sky-500 text-2xl"></i>
+                            </div>
+                            <p class="text-xs text-sky-800 font-semibold">Gunakan webcam! Gerakkan telapak tangan & jepit (pinch) jari untuk tekan bel!</p>
+                            <div class="absolute inset-0 rounded-2xl border-4 border-red-500 opacity-0 peer-checked:opacity-100 pointer-events-none transition"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Info Gesture -->
+                <div class="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 flex items-start space-x-3 text-left">
+                    <i class="fa-solid fa-circle-info text-emerald-500 text-xl mt-0.5"></i>
+                    <p class="text-xs text-emerald-900 font-semibold leading-relaxed">
+                        <strong>Petunjuk Kamera Gesture:</strong> Arahkan tangan ke kamera. Jepitkan <strong>Ibu Jari & Jari Telunjuk (Pinch)</strong> di atas tombol bel jawaban selama 0.5 detik untuk mengunci jawaban!
+                    </p>
+                </div>
+
+                <!-- Tombol Start -->
+                <button type="submit" class="w-full py-4 px-8 rounded-2xl bg-gradient-to-r from-red-500 via-amber-400 to-yellow-400 text-white font-black text-2xl tracking-wider uppercase hover:brightness-110 active:scale-95 shadow-xl shadow-red-500/30 transition transform flex items-center justify-center space-x-3 border-4 border-white">
+                    <span>MASUK PANGGUNG LOMBA</span>
+                    <i class="fa-solid fa-flag-checkered"></i>
+                </button>
+            </form>
+        </section>
+
+
+        <!-- ================= SCREEN 2: GAMEPLAY BOARD ================= -->
+        <section id="screenGame" class="w-full max-w-4xl bg-white rounded-3xl p-5 md:p-7 border-4 border-amber-400 shadow-2xl hidden flex flex-col space-y-5 my-auto relative overflow-hidden">
+            
+            <!-- Mini Webcam Feed -->
+            <div id="miniWebcamContainer" class="absolute top-4 right-4 z-20 hidden">
+                <div class="relative w-28 h-20 rounded-xl overflow-hidden border-4 border-yellow-400 shadow-md bg-black">
+                    <canvas id="webcamCanvas" class="w-full h-full object-cover transform -scale-x-100"></canvas>
+                    <div class="absolute bottom-1 left-1 bg-sky-900/90 px-1.5 py-0.5 rounded text-[9px] font-bold text-yellow-300">
+                        <i class="fa-solid fa-video mr-1"></i>Kamera Active
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Stage Status -->
+            <div class="flex flex-wrap justify-between items-center gap-3 bg-sky-100 p-4 rounded-2xl border-2 border-sky-300 shadow-inner">
+                <!-- Level Badge -->
+                <div class="flex items-center space-x-3">
+                    <div class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-red-500 to-amber-500 text-white font-black text-sm shadow">
+                        <span id="levelBadge">LEVEL 1</span>
+                    </div>
+                    <span id="levelTitle" class="text-xs md:text-sm font-black text-sky-900">Bunyi & Simbol Dasar</span>
+                </div>
+
+                <!-- Progress Soal -->
+                <div class="flex items-center space-x-2 bg-white px-3 py-1 rounded-xl border border-sky-200">
+                    <span class="text-xs text-sky-700 font-bold">SOAL:</span>
+                    <span id="questionNum" class="text-lg font-black text-red-500">1/10</span>
+                </div>
+
+                <!-- Timer -->
+                <div class="flex items-center space-x-2 bg-yellow-300 px-4 py-1.5 rounded-xl border-2 border-yellow-500 shadow-sm">
+                    <i class="fa-solid fa-stopwatch text-slate-900 text-lg animate-pulse"></i>
+                    <span id="timerText" class="text-xl font-black font-outfit text-slate-900">15</span>
+                    <span class="text-xs text-slate-800 font-bold">detik</span>
+                </div>
+
+                <!-- Score -->
+                <div class="flex items-center space-x-2 bg-white px-4 py-1.5 rounded-xl border border-sky-200">
+                    <i class="fa-solid fa-trophy text-amber-500"></i>
+                    <span id="currentScore" class="text-xl font-black text-slate-900 font-outfit">0</span>
+                    <span class="text-xs text-slate-500 font-bold">PTS</span>
+                </div>
+            </div>
+
+            <!-- Question Blackboard Box -->
+            <div class="relative board-wooden p-6 md:p-8 rounded-3xl text-center">
+                <div class="inline-block px-3 py-1 rounded-full bg-white/90 text-amber-900 text-xs font-black mb-3 border border-amber-300 shadow-sm" id="difficultyTag">
+                    LOTS • KOGNITIF DASAR
+                </div>
+                <h3 id="questionText" class="text-lg md:text-2xl font-black text-slate-900 leading-relaxed font-handwritten">
+                    Loading Pertanyaan Lomba Cerdas Cermat...
+                </h3>
+            </div>
+
+            <!-- Options Grid (A, B, C Buttons) -->
+            <div id="optionsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Option A -->
+                <button onclick="selectOption('A')" data-option="A" class="opt-card opt-card-a opt-button group p-5 rounded-3xl text-white flex flex-col justify-between text-left h-full transition">
+                    <div class="flex items-center justify-between w-full mb-3">
+                        <span class="w-10 h-10 rounded-2xl bg-white text-red-600 font-black text-xl flex items-center justify-center shadow">A</span>
+                        <span class="text-xs bg-red-800/40 px-2 py-1 rounded-full font-bold">Tombol A</span>
+                    </div>
+                    <p id="optA_Text" class="font-black text-base md:text-lg leading-snug drop-shadow-sm">Option A</p>
+                </button>
+
+                <!-- Option B -->
+                <button onclick="selectOption('B')" data-option="B" class="opt-card opt-card-b opt-button group p-5 rounded-3xl text-slate-900 flex flex-col justify-between text-left h-full transition">
+                    <div class="flex items-center justify-between w-full mb-3">
+                        <span class="w-10 h-10 rounded-2xl bg-slate-900 text-yellow-300 font-black text-xl flex items-center justify-center shadow">B</span>
+                        <span class="text-xs bg-amber-800/20 px-2 py-1 rounded-full font-bold">Tombol B</span>
+                    </div>
+                    <p id="optB_Text" class="font-black text-base md:text-lg leading-snug">Option B</p>
+                </button>
+
+                <!-- Option C -->
+                <button onclick="selectOption('C')" data-option="C" class="opt-card opt-card-c opt-button group p-5 rounded-3xl text-white flex flex-col justify-between text-left h-full transition">
+                    <div class="flex items-center justify-between w-full mb-3">
+                        <span class="w-10 h-10 rounded-2xl bg-white text-emerald-600 font-black text-xl flex items-center justify-center shadow">C</span>
+                        <span class="text-xs bg-emerald-900/40 px-2 py-1 rounded-full font-bold">Tombol C</span>
+                    </div>
+                    <p id="optC_Text" class="font-black text-base md:text-lg leading-snug drop-shadow-sm">Option C</p>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ================= FEEDBACK OVERLAY / MODAL ================= -->
+        <div id="feedbackModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+            <div id="feedbackCard" class="w-full max-w-lg bg-white rounded-3xl p-6 md:p-8 border-4 border-sky-400 text-center shadow-2xl transform transition-all scale-95 opacity-0">
+                <!-- Status Icon -->
+                <div id="feedbackIconBox" class="w-20 h-20 rounded-3xl mx-auto mb-4 flex items-center justify-center text-4xl shadow-lg">
+                    <i id="feedbackIcon" class="fa-solid fa-check"></i>
+                </div>
+
+                <h3 id="feedbackTitle" class="text-3xl font-black mb-2 text-slate-900">JAWABAN BENAR!</h3>
+                <p id="feedbackSubtitle" class="text-sm font-bold text-slate-600 mb-4">Hebat sekali, kamu mendapat +100 poin!</p>
+
+                <!-- Educational Explanation Box -->
+                <div class="bg-amber-50 rounded-2xl p-4 border-2 border-amber-300 text-left mb-6 shadow-inner">
+                    <div class="flex items-center space-x-2 text-amber-800 text-xs font-black mb-1">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                        <span>CATATAN JURI CERDAS CERMAT:</span>
+                    </div>
+                    <p id="feedbackExplanation" class="text-slate-800 text-sm font-semibold leading-relaxed">
+                        Penjelasan detail mengenai jawaban akan tampil di sini untuk pembelajaran siswa.
+                    </p>
+                </div>
+
+                <button id="btnNextQuestion" onclick="nextQuestion()" class="opt-button w-full py-4 rounded-2xl bg-gradient-to-r from-sky-400 to-blue-600 text-white font-black text-lg uppercase tracking-wider hover:brightness-110 active:scale-95 shadow-lg transition border-2 border-white">
+                    Lanjut Soal Berikutnya <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+
+        <!-- ================= SCREEN: LEVEL COMPLETE / TREASURE MODAL ================= -->
+        <div id="levelCompleteModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+            <div id="levelCompleteCard" class="w-full max-w-lg bg-white rounded-3xl p-6 md:p-8 border-4 border-yellow-400 text-center shadow-2xl transform transition-all scale-95 opacity-0 relative overflow-hidden">
+                
+                <span id="levelSuccessTag" class="inline-block px-4 py-1.5 rounded-full bg-yellow-100 border-2 border-yellow-400 text-amber-800 text-xs font-black tracking-widest uppercase mb-3">
+                    LEVEL 1 SELESAI!
+                </span>
+
+                <h3 id="levelSuccessTitle" class="text-3xl md:text-4xl font-black text-slate-900 mb-2">
+                    SELAMAT! KAMU LULUS!
+                </h3>
+                <p id="levelSuccessSubtitle" class="text-slate-600 font-bold text-sm mb-4">
+                    Kamu berhasil menjawab <span id="lvlScoreText" class="text-red-500 font-black">8/10</span> soal dengan benar (80%)!
+                </p>
+
+                <!-- Harta Karun Item Reveal -->
+                <div class="my-5 p-5 bg-gradient-to-b from-yellow-50 to-amber-100 rounded-3xl border-4 border-yellow-400 shadow-inner flex flex-col items-center justify-center relative">
+                    <span class="text-xs font-black text-amber-900 tracking-wider mb-2 uppercase">
+                        <i class="fa-solid fa-key mr-1"></i>Harta Karun Juara Terbuka!
+                    </span>
+                    
+                    <div id="treasureIconContainer" class="w-24 h-24 rounded-3xl bg-amber-400 border-4 border-white flex items-center justify-center text-white text-5xl my-2 shadow-xl chest-anim floating-treasure">
+                        <i id="treasureIcon" class="fa-solid fa-gem"></i>
+                    </div>
+
+                    <h4 id="treasureName" class="text-xl font-black text-amber-900 mt-2">
+                        Permata Emas Bintang
+                    </h4>
+                    <p id="treasureDesc" class="text-xs text-amber-800 font-semibold max-w-xs mt-1">
+                        Simbol keagungan dan ketuhanan dari Sila Pertama Pancasila.
+                    </p>
+                </div>
+
+                <button onclick="continueToNextLevel()" class="opt-button w-full py-4 rounded-2xl bg-gradient-to-r from-red-500 via-amber-400 to-yellow-400 text-white font-black text-lg uppercase tracking-wider hover:brightness-110 active:scale-95 shadow-xl transition border-2 border-white">
+                    Lanjut ke Level Berikutnya <i class="fa-solid fa-circle-play ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+
+        <!-- ================= SCREEN: LEVEL FAILED (SCORE < 70%) ================= -->
+        <div id="levelFailedModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+            <div id="levelFailedCard" class="w-full max-w-lg bg-white rounded-3xl p-6 md:p-8 border-4 border-red-500 text-center shadow-2xl transform transition-all scale-95 opacity-0">
+                <div class="w-20 h-20 rounded-3xl bg-red-100 border-4 border-red-400 text-red-500 mx-auto flex items-center justify-center text-4xl mb-4 shadow">
+                    <i class="fa-solid fa-rotate-right animate-spin"></i>
+                </div>
+
+                <span class="inline-block px-4 py-1.5 rounded-full bg-red-100 border-2 border-red-400 text-red-700 text-xs font-black tracking-widest uppercase mb-2">
+                    BELUM MENCAPAI TARGET KKM (MIN. 70%)
+                </span>
+
+                <h3 class="text-3xl font-black text-slate-900 mb-2">
+                    COBA LAGI YUUUK!
+                </h3>
+                <p id="levelFailedText" class="text-slate-600 font-semibold text-sm mb-6 leading-relaxed">
+                    Kamu menjawab <span id="failedScoreText" class="text-red-500 font-black">5/10</span> soal dengan benar (50%). Kamu butuh minimal 7 jawaban benar (70%) untuk mengumpulkan Harta Karun Lomba dan naik ke level selanjutnya!
+                </p>
+
+                <button onclick="repeatCurrentLevel()" class="opt-button w-full py-4 rounded-2xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-black text-lg uppercase tracking-wider hover:brightness-110 active:scale-95 shadow-xl transition border-2 border-white">
+                    <i class="fa-solid fa-arrow-rotate-left mr-2"></i>Ulangi Level Ini
+                </button>
+            </div>
+        </div>
+
+
+        <!-- ================= SCREEN 3: RESULT & CHAMPION APPRECIATION ================= -->
+        <section id="screenResult" class="w-full max-w-3xl bg-white rounded-3xl p-6 md:p-8 border-4 border-yellow-400 shadow-2xl hidden text-center my-auto relative overflow-hidden">
+            
+            <!-- Champion Trophy Ribbon -->
+            <div class="relative w-28 h-28 mx-auto mb-4">
+                <div class="w-28 h-28 rounded-full bg-gradient-to-tr from-yellow-300 via-amber-400 to-yellow-500 flex items-center justify-center text-white text-6xl shadow-2xl border-4 border-white animate-bounce-gentle">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-red-500 text-white font-black text-lg flex items-center justify-center border-2 border-white shadow">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+            </div>
+
+            <span class="inline-block px-4 py-1.5 rounded-full bg-yellow-100 border-2 border-yellow-400 text-amber-900 text-xs font-black tracking-widest uppercase mb-2">
+                🏆 JUARA 1 LOMBA CERDAS CERMAT PANCASILA 🏆
+            </span>
+
+            <h2 id="resultPlayerName" class="text-3xl md:text-5xl font-black text-slate-900 mb-2">
+                Selamat, Budi!
+            </h2>
+            <p id="resultPersonalMsg" class="text-slate-600 font-semibold text-sm md:text-base max-w-xl mx-auto mb-6">
+                Kamu telah menuntaskan seluruh 5 Level Lomba Cerdas Cermat dan berhasil membawa pulang Medali Emas serta Seluruh Harta Karun Pancasila Sekolah!
+            </p>
+
+            <!-- Total Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                <div class="bg-sky-50 p-3.5 rounded-2xl border-2 border-sky-200">
+                    <span class="block text-[10px] font-black text-sky-800 uppercase mb-1">TOTAL SKOR JUARA</span>
+                    <span id="finalScore" class="text-2xl md:text-3xl font-black text-red-500 font-outfit">4800</span>
+                </div>
+                <div class="bg-emerald-50 p-3.5 rounded-2xl border-2 border-emerald-200">
+                    <span class="block text-[10px] font-black text-emerald-800 uppercase mb-1">AKURASI KESELURUHAN</span>
+                    <span id="finalAccuracy" class="text-2xl md:text-3xl font-black text-emerald-600 font-outfit">90%</span>
+                </div>
+                <div class="col-span-2 md:col-span-1 bg-amber-50 p-3.5 rounded-2xl border-2 border-amber-200">
+                    <span class="block text-[10px] font-black text-amber-800 uppercase mb-1">MEDALI KEHORMATAN</span>
+                    <span class="text-2xl md:text-3xl font-black text-amber-600 font-outfit">EMAS KELAS 2</span>
+                </div>
+            </div>
+
+            <!-- Harta Karun Vault / Collection Display -->
+            <div class="bg-amber-50 p-4 rounded-3xl border-2 border-amber-300 mb-6 text-left shadow-inner">
+                <h4 class="text-xs font-black text-amber-900 uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-box-open mr-2"></i>Koleksi Harta Karun Lomba Terkumpul:</span>
+                    <span class="text-amber-700 font-bold">5 / 5 Harta</span>
+                </h4>
+                <div id="treasuresVault" class="grid grid-cols-5 gap-2 text-center">
+                    <!-- Dynamic Treasures Vault Items -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button onclick="restartGame()" class="opt-button flex-1 py-4 px-6 rounded-2xl bg-gradient-to-r from-red-500 via-amber-400 to-yellow-400 text-white font-black text-lg uppercase tracking-wider hover:brightness-110 active:scale-95 shadow-xl transition border-2 border-white">
+                    <i class="fa-solid fa-rotate-left mr-2"></i>Main Lagi Dari Awal
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Stage Banner -->
+    <div class="bunting-banner w-full"></div>
+
+    <!-- Footer Credit -->
+    <footer class="w-full text-center py-2.5 bg-white/90 text-xs font-bold text-sky-900 border-t-2 border-sky-200 relative z-30">
+        LOMBA CERDAS CERMAT PANCASILA SD • Powered by MediaPipe Hands & Web Audio Engine
+    </footer>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        /* --------------------------------------------------------
+           1. TREASURES & QUESTION BANK DATA
+        -------------------------------------------------------- */
+        const TREASURES_DATA = {
+            1: { name: "Peti Bintang Emas", icon: "fa-solid fa-star text-yellow-300", desc: "Cahaya pedoman rohani dari Sila Pertama." },
+            2: { name: "Pin Rantai Persaudaraan", icon: "fa-solid fa-link text-pink-400", desc: "Simbol persatuan dan persaudaraan tanpa batas." },
+            3: { name: "Mahkota Pohon Beringin", icon: "fa-solid fa-tree text-emerald-400", desc: "Peneduh persatuan seluruh rakyat Indonesia." },
+            4: { name: "Perisai Banteng Musyawarah", icon: "fa-solid fa-shield-cat text-cyan-400", desc: "Perisai kebijaksanaan musyawarah dan mufakat." },
+            5: { name: "Piala Padi & Kapas Permata", icon: "fa-solid fa-trophy text-amber-400", desc: "Simbol kemakmuran dan keadilan sosial bagi seluruh rakyat!" }
+        };
+
+        const QUESTION_BANK = {
+            1: [
+                { q: "Apa simbol dari Sila Pertama Pancasila?", a: "Bintang", b: "Rantai", c: "Pohon Beringin", ans: "A", exp: "Sila pertama 'Ketuhanan Yang Maha Esa' dilambangkan oleh Bintang Emas bercahaya." },
+                { q: "Bagaimana bunyi dari Sila Kedua Pancasila?", a: "Persatuan Indonesia", b: "Kemanusiaan yang adil dan beradab", c: "Keadilan sosial bagi seluruh rakyat", ans: "B", exp: "Sila kedua berbunyi 'Kemanusiaan yang adil dan beradab'." },
+                { q: "Lambang Pohon Beringin merupakan simbol Pancasila sila ke-...", a: "Ke-2", b: "Ke-3", c: "Ke-4", ans: "B", exp: "Pohon beringin merepresentasikan Sila ke-3: Persatuan Indonesia." },
+                { q: "Kepala Banteng adalah simbol dari Pancasila sila ke-...", a: "Ke-3", b: "Ke-4", c: "Ke-5", ans: "B", exp: "Kepala Banteng melambangkan Sila ke-4 yang berkaitan dengan musyawarah." },
+                { q: "Padi dan Kapas merupakan simbol Pancasila sila ke-...", a: "Ke-5", b: "Ke-4", c: "Ke-1", ans: "A", exp: "Padi dan Kapas melambangkan keadilan pangan dan sandang pada Sila ke-5." },
+                { q: "Sila ketiga Pancasila berbunyi...", a: "Ketuhanan Yang Maha Esa", b: "Persatuan Indonesia", c: "Keadilan Sosial", ans: "B", exp: "Sila ke-3 Pancasila berbunyi 'Persatuan Indonesia'." },
+                { q: "Mata rantai berbentuk segi empat dan lingkaran melambangkan sila ke-...", a: "Ke-1", b: "Ke-2", c: "Ke-3", ans: "B", exp: "Rantai melambangkan Sila ke-2 (Kemanusiaan yang adil dan beradab)." },
+                { q: "Pancasila memiliki jumlah sila sebanyak...", a: "3 Sila", b: "4 Sila", c: "5 Sila", ans: "C", exp: "Pancasila terdiri dari 5 dasar negara Indonesia." },
+                { q: "Warna latar belakang simbol Bintang pada perisai Pancasila adalah...", a: "Hitam", b: "Merah", c: "Putih", ans: "A", exp: "Simbol bintang memiliki latar belakang warna hitam." },
+                { q: "Dasar negara Indonesia dinamakan...", a: "UUD 1945", b: "Pancasila", c: "Bhinneka Tunggal Ika", ans: "B", exp: "Pancasila adalah dasar negara Republik Indonesia." }
+            ],
+            2: [
+                { q: "Simbol Rantai pada sila kedua melambangkan bahwa manusia harus...", a: "Saling berselisih", b: "Saling bersatu dan membantu", c: "Bekerja sendirian", ans: "B", exp: "Mata rantai bersambung artinya pria dan wanita saling bersatu dan tolong-menolong." },
+                { q: "Warna hijau kapas dan putih pada sila kelima melambangkan...", a: "Keberanian", b: "Kemakmuran dan kesucian", c: "Kekuatan fisik", ans: "B", exp: "Padi dan Kapas melambangkan kebutuhan dasar manusia untuk kemakmuran." },
+                { q: "Pohon beringin memiliki akar yang kuat mendalam, artinya...", a: "Indonesia tempat berteduh dan bersatu", b: "Indonesia negara yang luas", c: "Rakyat suka menanam pohon", ans: "A", exp: "Pohon beringin melambangkan tempat berteduh bagi seluruh rakyat Indonesia." },
+                { q: "Banteng dikenal sebagai hewan yang suka berkumpul, melambangkan...", a: "Musyawarah dan berkumpul", b: "Berbuat jahat bersama", c: "Berkelahi", ans: "A", exp: "Banteng melambangkan budaya berkumpul untuk bermusyawarah mengambil keputusan." },
+                { q: "Cahaya bintang bersudut lima melambangkan kepercayaan kepada...", a: "Tuhan Yang Maha Esa", b: "Presiden", c: "Kekuatan alam", ans: "A", exp: "Bintang emas melambangkan cahaya rohani dari Tuhan YME kepada manusia." },
+                { q: "Sebelum makan bersama keluarga, sebaiknya kita melakukan...", a: "Berdoa bersama", b: "Langsung menghabiskan makanan", c: "Bermain HP", ans: "A", exp: "Berdoa sebelum makan adalah pengamalan Sila ke-1." },
+                { q: "Jika ada teman yang jatuh dari sepeda, tindakan sesuai sila kedua adalah...", a: "Menertawakannya", b: "Menolongnya berdiri", c: "Meninggalkannya", ans: "B", exp: "Menolong teman yang membutuhkan adalah bentuk kemanusiaan (Sila ke-2)." },
+                { q: "Membersihkan ruang kelas bersama-sama dinamakan...", a: "Piket bersama", b: "Musyawarah", c: "Upacara", ans: "A", exp: "Piket bersama melatih gotong royong dan persatuan (Sila ke-3)." },
+                { q: "Menghormati teman yang sedang beribadah sesuai dengan sila ke-...", a: "Ke-1", b: "Ke-2", c: "Ke-3", ans: "A", exp: "Toleransi antar umat beragama adalah wujud penerapan Sila ke-1." },
+                { q: "Menghargai pendapat teman saat memilih ketua kelas adalah pengamalan sila ke-...", a: "Ke-2", b: "Ke-4", c: "Ke-5", ans: "B", exp: "Menghargai pendapat dalam pemilihan merupakan penerapan musyawarah Sila ke-4." }
+            ],
+            3: [
+                { q: "Budi tidak membeda-bedakan teman berdasarkan suku saat bermain. Sikap Budi mencerminkan sila...", a: "Ke-1", b: "Ke-3", c: "Ke-5", ans: "B", exp: "Menjaga kerukunan antar suku mencerminkan Persatuan Indonesia (Sila ke-3)." },
+                { q: "Dalam diskusi kelompok, Siti mendengarkan pendapat temannya dengan tenang. Ini penerapan sila...", a: "Ke-4", b: "Ke-2", c: "Ke-1", ans: "A", exp: "Menghargai orang lain berbicara dalam musyawarah adalah wujud Sila ke-4." },
+                { q: "Membagi kue secara adil kepada adik dan kakak di rumah sesuai dengan sila...", a: "Ke-2", b: "Ke-5", c: "Ke-1", ans: "B", exp: "Bersikap adil dalam berbagi merupakan pengamalan Sila ke-5." },
+                { q: "Saat pemilihan ketua kelas, calon yang kamu pilih kalah. Sikap yang benar adalah...", a: "Marah dan tidak mau berteman", b: "Menerima hasil keputusan dengan lapang dada", c: "Keluar dari kelas", ans: "B", exp: "Lapang dada menerima hasil musyawarah adalah wujud kedewasaan Sila ke-4." },
+                { q: "Menghemat air dan listrik di rumah merupakan wujud perilaku hemat sesuai sila ke-...", a: "Ke-5", b: "Ke-3", c: "Ke-2", ans: "A", exp: "Tidak bergaya hidup pemboros merupakan pengamalan Sila ke-5." },
+                { q: "Mengucapkan salam dan bersikap sopan kepada guru merupakan contoh sila ke-...", a: "Ke-1", b: "Ke-2", c: "Ke-4", ans: "B", exp: "Bersikap sopan santun adalah wujud kemanusiaan yang beradab (Sila ke-2)." },
+                { q: "Mengikuti upacara bendera dengan tertib setiap hari Senin melatih rasa persatuan sila ke-...", a: "Ke-3", b: "Ke-1", c: "Ke-5", ans: "A", exp: "Upacara bendera meningkatkan jiwa nasionalisme dan persatuan (Sila ke-3)." },
+                { q: "Jika kamu memecahkan vas bunga milik ibu tanpa sengaja, sebaiknya...", a: "Jujur meminta maaf pada ibu", b: "Menuduh kucing yang memecahkan", c: "Pura-pura tidak tahu", ans: "A", exp: "Jujur dan bertanggung jawab adalah perilaku beradab (Sila ke-2)." },
+                { q: "Setiap hari Minggu, keluarga Edo beribadah sesuai agamanya masing-masing. Ini pengamalan sila...", a: "Ke-1", b: "Ke-3", c: "Ke-4", ans: "A", exp: "Melaksanakan ibadah agama adalah wujud Sila ke-1." },
+                { q: "Gotong royong membersihkan selokan desa merupakan pengamalan sila...", a: "Ke-1", b: "Ke-3", c: "Ke-4", ans: "B", exp: "Gotong royong mempererat persatuan masyarakat (Sila ke-3)." }
+            ],
+            4: [
+                { q: "Lani punya kue lebih. Di dekatnya ada temannya yang lupa membawa bekal. Apa tindakan terbaik Lani?", a: "Makan di depan teman agar dia tergiur", b: "Berbagi kue secara ikhlas", c: "Menjual kuenya dengan harga mahal", ans: "B", exp: "Berbagi bekal adalah wujud rasa peduli kemanusiaan (Sila ke-2)." },
+                { q: "Ketika kelompokmu berbeda pendapat dalam memilih lagu tarian, cara terbaik menyelesaikannya adalah...", a: "Voting / musyawarah bersama", b: "Mengikuti keinginan anak terpandai saja", c: "Batal ikut lomba tarian", ans: "A", exp: "Musyawarah mufakat adalah solusi terbaik menyelesaikan perbedaan (Sila ke-4)." },
+                { q: "Dino suka membeli produk buatan dalam negeri daripada barang impor. Perilaku Dino mendukung sila...", a: "Ke-1", b: "Ke-3", c: "Ke-2", ans: "B", exp: "Cinta produk Indonesia adalah wujud cinta tanah air (Sila ke-3)." },
+                { q: "Doni meminjam pensil teman tetapi merusakkannya. Tindakan yang mencerminkan tanggung jawab adalah...", a: "Mengembalikannya diam-diam", b: "Minta maaf dan mengganti pensil tersebut", c: "Menyalahkan orang lain", ans: "B", exp: "Bertanggung jawab atas kesalahan adalah pengamalan Sila ke-2." },
+                { q: "Mengapa kita tidak boleh memusuhi teman yang berbeda agama?", a: "Karena semua manusia ciptaan Tuhan yang seimbang", b: "Karena takut dimarahi guru", c: "Karena tidak ada gunanya", ans: "A", exp: "Sila ke-1 mengajarkan saling menghargai ciptaan Tuhan YME." },
+                { q: "Di kelas 2 SD, ada murid baru dari daerah lain yang bahasa berbicaranya berbeda. Sikap kita adalah...", a: "Ejek cara bicaranya", b: "Ajak bermain dan belajar bahasa bersama", c: "Jauhi murid tersebut", ans: "B", exp: "Menghargai keragaman suku dan bahasa menjaga Persatuan (Sila ke-3)." },
+                { q: "Saat antre membeli makanan di kantin, Andi memotong antrean orang lain. Perilaku Andi melanggar sila...", a: "Ke-5", b: "Ke-1", c: "Ke-3", ans: "A", exp: "Memotong antrean melanggar hak orang lain dan tidak bersikap adil (Sila ke-5)." },
+                { q: "Edo ingin bermain game, tapi ibunya meminta bantuan menyiram tanaman. Tindakan yang bijak adalah...", a: "Membantu ibu dulu baru bermain", b: "Pura-pura tidur", c: "Acuh tak acuh", ans: "A", exp: "Membantu orang tua merupakan wujud bakti dan kasih sayang keluarga." },
+                { q: "Hasil musyawarah kelas memutuskan untuk piket tiap sore. Walau kamu ingin cepat pulang, kamu sebaiknya...", a: "Melaksanakan keputusan piket bersama", b: "Langsung lari pulang", c: "Protes keras", ans: "A", exp: "Menjalankan hasil keputusan musyawarah dengan bertanggung jawab (Sila ke-4)." },
+                { q: "Menjaga fasilitas umum seperti tidak mencoret-coret tembok sekolah termasuk pengamalan sila...", a: "Ke-5", b: "Ke-1", c: "Ke-2", ans: "A", exp: "Menjaga kepentingan umum adalah bagian dari pengamalan Sila ke-5." }
+            ],
+            5: [
+                { q: "Mengapa musyawarah sangat penting dalam mengambil keputusan bersama di sekolah?", a: "Agar cepat selesai tanpa bicara", b: "Agar keputusan adil dan disepakati bersama", c: "Agar ketua kelas bisa berkuasa", ans: "B", exp: "Musyawarah memastikan suara setiap anggota dihargai secara adil (Sila ke-4)." },
+                { q: "Simbol Bintang Emas dan Pohon Beringin jika digabungkan dalam kehidupan sekolah bermakna...", a: "Taat beribadah dan menjaga persatuan antar siswa", b: "Rajin belajar dan selalu menang lomba", c: "Suka makan dan jalan-jalan", ans: "A", exp: "Bintang = Nilai Agama/Sila 1; Pohon Beringin = Nilai Persatuan/Sila 3." },
+                { q: "Siswa yang suka menabung dan tidak menghabiskan semua uang saku menerapkan nilai sila...", a: "Ke-5 (Tidak bergaya hidup pemboros)", b: "Ke-1 (Ibadah)", c: "Ke-4 (Musyawarah)", ans: "A", exp: "Hemat dan suka menabung adalah butir nilai Sila ke-5 Pancasila." },
+                { q: "Apa dampak negatif jika di kelas tidak ada sikap persatuan (Sila ke-3)?", a: "Kelas menjadi tenang", b: "Sering terjadi pertengkaran dan perpecahan", c: "Nilai ujian bertambah", ans: "B", exp: "Tanpa persatuan, lingkungan menjadi tidak harmonis dan mudah terpecah." },
+                { q: "Manakah contoh keadilan sosial (Sila ke-5) yang dilakukan oleh seorang guru di kelas?", a: "Hanya menyapa siswa yang kaya", b: "Memberikan perhatian dan hak belajar adil pada semua siswa", c: "Memberikan nilai tinggi tanpa ujian", ans: "B", exp: "Keadilan sosial berarti memberikan hak seimbang tanpa membeda-bedakan." },
+                { q: "Jika kamu melihat temanmu berbuat curang saat ujian sekolah, tindakan paling tepat adalah...", a: "Ikut-ikutan curang", b: "Mengingatkan dengan sopan atau melaporkan ke guru", c: "Mendukung kejahatannya", ans: "B", exp: "Kejujuran melatih integritas moral sesuai nilai-nilai Pancasila." },
+                { q: "Keseimbangan antara melaksanakan kewajiban dan menuntut hak adalah inti dari sila ke-...", a: "Ke-5", b: "Ke-1", c: "Ke-3", ans: "A", exp: "Menjaga keseimbangan antara hak dan kewajiban merupakan butir Sila ke-5." },
+                { q: "Bagaimana cara anak kelas 2 SD mempertahankan nilai 'Kemanusiaan yang Adil dan Beradab'?", a: "Bersikap sopan, tidak membully, dan menyayangi sesama", b: "Selalu ingin menang sendiri", c: "Hanya berteman dengan yang satu agama saja", ans: "A", exp: "Sopan santun dan anti-bullying adalah wujud nyata Sila ke-2 di sekolah." },
+                { q: "Gambar lambang Pancasila di dada Burung Garuda dipasang sebagai...", a: "Hiasan dinding saja", b: "Jantung dan pedoman hidup bangsa Indonesia", c: "Mainan anak-anak", ans: "B", exp: "Perisai Pancasila melambangkan benteng perlindungan dan pedoman hidup bangsa." },
+                { q: "Pancasila disahkan sebagai dasar negara Indonesia pada tanggal...", a: "17 Agustus 1945", b: "18 Agustus 1945", c: "28 Oktober 1928", ans: "B", exp: "Pancasila secara resmi disahkan oleh PPKI pada tanggal 18 Agustus 1945." }
+            ]
+        };
+
+        const LEVEL_TITLES = {
+            1: "Bunyi & Simbol Dasar",
+            2: "Makna Lambang & Sikap",
+            3: "Perilaku Sekolah & Rumah",
+            4: "Analisis Dilema Siswa",
+            5: "Evaluasi Pancasila HOTS"
+        };
+
+        /* --------------------------------------------------------
+           2. STATE & SOUND SYNTHESIZER
+        -------------------------------------------------------- */
+        let state = {
+            playerName: "Siswa",
+            controlMode: "touch",
+            currentLevel: 1,
+            questionIndex: 0,
+            score: 0,
+            levelCorrectCount: 0,
+            totalCorrectCount: 0,
+            collectedTreasures: [],
+            timer: 15,
+            timerInterval: null,
+            audioEnabled: true,
+            isAnsweringAllowed: true,
+            currentQuestionData: null
+        };
+
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            if (!state.audioEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+
+                if (type === 'click') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(450, now);
+                    osc.frequency.exponentialRampToValueAtTime(850, now + 0.08);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now); osc.stop(now + 0.08);
+                } else if (type === 'bell') {
+                    // Cerdas Cermat Bell Sound
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(987.77, now); // B5
+                    osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now); osc.stop(now + 0.4);
+                } else if (type === 'correct') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.1);
+                    osc.frequency.setValueAtTime(783.99, now + 0.2);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now); osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.setValueAtTime(160, now + 0.15);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                } else if (type === 'levelWin') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50, 880.00, 1046.50];
+                    notes.forEach((freq, i) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.12);
+                        g.gain.setValueAtTime(0.25, now + i * 0.12);
+                        g.gain.linearRampToValueAtTime(0.01, now + i * 0.12 + 0.22);
+                        o.connect(g); g.connect(ctx.destination);
+                        o.start(now + i * 0.12); o.stop(now + i * 0.12 + 0.22);
+                    });
+                } else if (type === 'failed') {
+                    const notes = [300, 260, 220, 180];
+                    notes.forEach((freq, i) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'sawtooth';
+                        o.frequency.setValueAtTime(freq, now + i * 0.15);
+                        g.gain.setValueAtTime(0.2, now + i * 0.15);
+                        g.gain.linearRampToValueAtTime(0.01, now + i * 0.15 + 0.2);
+                        o.connect(g); g.connect(ctx.destination);
+                        o.start(now + i * 0.15); o.stop(now + i * 0.15 + 0.2);
+                    });
+                } else if (type === 'megaWin') {
+                    const melody = [
+                        {f: 523.25, d: 0.15}, {f: 659.25, d: 0.15}, {f: 783.99, d: 0.15},
+                        {f: 1046.50, d: 0.3}, {f: 880.00, d: 0.2}, {f: 1046.50, d: 0.5}
+                    ];
+                    let timeAcc = 0;
+                    melody.forEach(item => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'sine';
+                        o.frequency.setValueAtTime(item.f, now + timeAcc);
+                        g.gain.setValueAtTime(0.3, now + timeAcc);
+                        g.gain.linearRampToValueAtTime(0.01, now + timeAcc + item.d);
+                        o.connect(g); g.connect(ctx.destination);
+                        o.start(now + timeAcc); o.stop(now + timeAcc + item.d);
+                        timeAcc += item.d;
+                    });
+                }
+            } catch (e) {
+                console.warn("Audio synth warning:", e);
+            }
+        }
+
+        function toggleAudio() {
+            state.audioEnabled = !state.audioEnabled;
+            const icon = document.getElementById('audioIcon');
+            icon.className = state.audioEnabled ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark text-red-500";
+        }
+
+        /* --------------------------------------------------------
+           3. MEDIAPIPE GESTURE PINCH ENGINE
+        -------------------------------------------------------- */
+        let hands = null;
+        let camera = null;
+        let pinchStartTime = null;
+        let activeHoverTarget = null;
+        const PINCH_THRESHOLD_PX = 45;
+        const PINCH_HOLD_TIME_MS = 450;
+
+        function startWebcamGesture() {
+            const videoElement = document.getElementById('webcamVideo');
+            const canvasElement = document.getElementById('webcamCanvas');
+            const canvasCtx = canvasElement.getContext('2d');
+            const handCursor = document.getElementById('handCursor');
+            const pinchProgress = document.getElementById('pinchProgressPath');
+            const camBadge = document.getElementById('camStatusBadge');
+            const miniCamContainer = document.getElementById('miniWebcamContainer');
+
+            miniCamContainer.classList.remove('hidden');
+            handCursor.classList.remove('hidden');
+
+            hands = new Hands({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            });
+
+            hands.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.6,
+                minTrackingConfidence: 0.6
+            });
+
+            hands.onResults((results) => {
+                canvasCtx.save();
+                canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+                if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                    const landmarks = results.multiHandLandmarks[0];
+
+                    const indexLandmark = landmarks[8];
+                    const thumbLandmark = landmarks[4];
+
+                    const cursorX = (1 - indexLandmark.x) * window.innerWidth;
+                    const cursorY = indexLandmark.y * window.innerHeight;
+
+                    handCursor.style.left = `${cursorX}px`;
+                    handCursor.style.top = `${cursorY}px`;
+
+                    const indexPxX = indexLandmark.x * window.innerWidth;
+                    const indexPxY = indexLandmark.y * window.innerHeight;
+                    const thumbPxX = thumbLandmark.x * window.innerWidth;
+                    const thumbPxY = thumbLandmark.y * window.innerHeight;
+
+                    const distance = Math.hypot(indexPxX - thumbPxX, indexPxY - thumbPxY);
+                    const isPinching = distance < PINCH_THRESHOLD_PX;
+
+                    // Detect Hover Target
+                    const hoveredElem = document.elementFromPoint(cursorX, cursorY);
+                    const optBtn = hoveredElem ? hoveredElem.closest('.opt-button') : null;
+
+                    if (optBtn && state.isAnsweringAllowed) {
+                        if (activeHoverTarget !== optBtn) {
+                            if (activeHoverTarget) activeHoverTarget.classList.remove('hovered');
+                            activeHoverTarget = optBtn;
+                            activeHoverTarget.classList.add('hovered');
+                        }
+
+                        if (isPinching) {
+                            if (!pinchStartTime) pinchStartTime = Date.now();
+                            const elapsed = Date.now() - pinchStartTime;
+                            const progressPercent = Math.min(100, (elapsed / PINCH_HOLD_TIME_MS) * 100);
+                            
+                            const dashoffset = 100 - progressPercent;
+                            pinchProgress.style.strokeDashoffset = dashoffset;
+
+                            if (elapsed >= PINCH_HOLD_TIME_MS) {
+                                playSound('bell');
+                                pinchStartTime = null;
+                                pinchProgress.style.strokeDashoffset = 100;
+                                activeHoverTarget.click();
+                            }
+                        } else {
+                            pinchStartTime = null;
+                            pinchProgress.style.strokeDashoffset = 100;
+                        }
+                    } else {
+                        if (activeHoverTarget) {
+                            activeHoverTarget.classList.remove('hovered');
+                            activeHoverTarget = null;
+                        }
+                        pinchStartTime = null;
+                        pinchProgress.style.strokeDashoffset = 100;
+                    }
+
+                    document.getElementById('camStatusDot').className = "w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2 animate-ping";
+                    document.getElementById('camStatusText').innerText = "Kamera Aktif";
+                } else {
+                    document.getElementById('camStatusDot').className = "w-2.5 h-2.5 rounded-full bg-amber-500 mr-2";
+                    document.getElementById('camStatusText').innerText = "Tangan Tak Terdeteksi";
+                }
+                canvasCtx.restore();
+            });
+
+            camera = new Camera(videoElement, {
+                onFrame: async () => {
+                    await hands.send({ image: videoElement });
+                },
+                width: 320,
+                height: 240
+            });
+
+            camera.start().catch((err) => {
+                console.error("Camera access error:", err);
+                alert("Kamera tidak dapat diakses. Game secara otomatis beralih ke mode Sentuh/Mouse!");
+                state.controlMode = 'touch';
+                handCursor.classList.add('hidden');
+                miniCamContainer.classList.add('hidden');
+            });
+        }
+
+        /* --------------------------------------------------------
+           4. GAMEPLAY CONTROLLER
+        -------------------------------------------------------- */
+        function startGame(e) {
+            e.preventDefault();
+            playSound('click');
+
+            const nameInput = document.getElementById('playerName').value.trim();
+            if (nameInput) state.playerName = nameInput;
+
+            state.controlMode = document.querySelector('input[name="controlMode"]:checked').value;
+
+            state.currentLevel = 1;
+            state.questionIndex = 0;
+            state.score = 0;
+            state.levelCorrectCount = 0;
+            state.totalCorrectCount = 0;
+            state.collectedTreasures = [];
+
+            document.getElementById('screenWelcome').classList.add('hidden');
+            document.getElementById('screenGame').classList.remove('hidden');
+
+            if (state.controlMode === 'gesture') {
+                startWebcamGesture();
+            }
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            state.isAnsweringAllowed = true;
+            const levelQuestions = QUESTION_BANK[state.currentLevel];
+            state.currentQuestionData = levelQuestions[state.questionIndex];
+
+            document.getElementById('levelBadge').innerText = `LEVEL ${state.currentLevel}`;
+            document.getElementById('levelTitle').innerText = LEVEL_TITLES[state.currentLevel];
+            document.getElementById('questionNum').innerText = `${state.questionIndex + 1}/10`;
+            document.getElementById('currentScore').innerText = state.score;
+
+            const diffTag = document.getElementById('difficultyTag');
+            if (state.currentLevel === 1) diffTag.innerText = "LOTS • MENGINGAT SIMBOL & BUNYI";
+            else if (state.currentLevel <= 3) diffTag.innerText = "MOTS • MEMAHAMI & PENGAMALAN SIKAP";
+            else diffTag.innerText = "HOTS • ANALISIS & KASUS SEKOLAH";
+
+            document.getElementById('questionText').innerText = state.currentQuestionData.q;
+            document.getElementById('optA_Text').innerText = state.currentQuestionData.a;
+            document.getElementById('optB_Text').innerText = state.currentQuestionData.b;
+            document.getElementById('optC_Text').innerText = state.currentQuestionData.c;
+
+            // Reset option styling
+            const optCards = document.querySelectorAll('.opt-card');
+            optCards.forEach(card => card.classList.remove('ring-4', 'ring-emerald-400', 'ring-red-500', 'animate-shake'));
+
+            startTimer(15);
+        }
+
+        function startTimer(seconds) {
+            clearInterval(state.timerInterval);
+            state.timer = seconds;
+            document.getElementById('timerText').innerText = state.timer;
+
+            state.timerInterval = setInterval(() => {
+                state.timer--;
+                document.getElementById('timerText').innerText = state.timer;
+
+                if (state.timer <= 0) {
+                    clearInterval(state.timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleTimeout() {
+            if (!state.isAnsweringAllowed) return;
+            state.isAnsweringAllowed = false;
+            playSound('wrong');
+
+            showFeedbackModal(false, "WAKTU HABIS!", "Sayang sekali, kamu belum sempat menekan tombol bel!");
+        }
+
+        function selectOption(selectedOpt) {
+            if (!state.isAnsweringAllowed) return;
+            state.isAnsweringAllowed = false;
+            clearInterval(state.timerInterval);
+
+            playSound('bell');
+
+            const isCorrect = selectedOpt === state.currentQuestionData.ans;
+            const clickedBtn = document.querySelector(`[data-option="${selectedOpt}"]`);
+
+            if (isCorrect) {
+                playSound('correct');
+                state.score += 100 + (state.timer * 5);
+                state.levelCorrectCount++;
+                state.totalCorrectCount++;
+                clickedBtn.classList.add('ring-4', 'ring-emerald-400');
+                
+                showFeedbackModal(true, "JAWABAN BENAR!", `Hebat sekali ${state.playerName}! Jawabanmu tepat 100%!`);
+            } else {
+                playSound('wrong');
+                clickedBtn.classList.add('ring-4', 'ring-red-500', 'animate-shake');
+                
+                const correctBtn = document.querySelector(`[data-option="${state.currentQuestionData.ans}"]`);
+                correctBtn.classList.add('ring-4', 'ring-emerald-400');
+
+                showFeedbackModal(false, "JAWABAN KURANG TEPAT", `Jawaban yang benar adalah Tombol Pilihan ${state.currentQuestionData.ans}.`);
+            }
+        }
+
+        function showFeedbackModal(isCorrect, title, subtitle) {
+            const modal = document.getElementById('feedbackModal');
+            const card = document.getElementById('feedbackCard');
+            const iconBox = document.getElementById('feedbackIconBox');
+            const icon = document.getElementById('feedbackIcon');
+
+            document.getElementById('feedbackTitle').innerText = title;
+            document.getElementById('feedbackSubtitle').innerText = subtitle;
+            document.getElementById('feedbackExplanation').innerText = state.currentQuestionData.exp;
+
+            if (isCorrect) {
+                iconBox.className = "w-20 h-20 rounded-3xl mx-auto mb-4 flex items-center justify-center text-4xl shadow-lg bg-emerald-500 text-white";
+                icon.className = "fa-solid fa-check-double";
+                document.getElementById('feedbackTitle').className = "text-3xl font-black mb-2 text-emerald-600";
+            } else {
+                iconBox.className = "w-20 h-20 rounded-3xl mx-auto mb-4 flex items-center justify-center text-4xl shadow-lg bg-red-500 text-white";
+                icon.className = "fa-solid fa-xmark";
+                document.getElementById('feedbackTitle').className = "text-3xl font-black mb-2 text-red-600";
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                card.classList.remove('scale-95', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            const modal = document.getElementById('feedbackModal');
+            const card = document.getElementById('feedbackCard');
+
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+
+                state.questionIndex++;
+                if (state.questionIndex >= 10) {
+                    evaluateLevelCompletion();
+                } else {
+                    loadQuestion();
+                }
+            }, 200);
+        }
+
+        function evaluateLevelCompletion() {
+            const levelAccuracy = (state.levelCorrectCount / 10) * 100;
+
+            if (levelAccuracy >= 70) {
+                // LULUS LEVEL (>= 70%)
+                playSound('levelWin');
+                confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+
+                const treasure = TREASURES_DATA[state.currentLevel];
+                state.collectedTreasures.push(treasure);
+
+                document.getElementById('levelSuccessTag').innerText = `LEVEL ${state.currentLevel} SELESAI!`;
+                document.getElementById('lvlScoreText').innerText = `${state.levelCorrectCount}/10 (${levelAccuracy}%)`;
+                document.getElementById('treasureName').innerText = treasure.name;
+                document.getElementById('treasureDesc').innerText = treasure.desc;
+                document.getElementById('treasureIcon').className = treasure.icon;
+
+                const lModal = document.getElementById('levelCompleteModal');
+                const lCard = document.getElementById('levelCompleteCard');
+                lModal.classList.remove('hidden');
+                setTimeout(() => {
+                    lCard.classList.remove('scale-95', 'opacity-0');
+                    lCard.classList.add('scale-100', 'opacity-100');
+                }, 10);
+
+            } else {
+                // BELUM LULUS (< 70%)
+                playSound('failed');
+                document.getElementById('failedScoreText').innerText = `${state.levelCorrectCount}/10 (${levelAccuracy}%)`;
+
+                const fModal = document.getElementById('levelFailedModal');
+                const fCard = document.getElementById('levelFailedCard');
+                fModal.classList.remove('hidden');
+                setTimeout(() => {
+                    fCard.classList.remove('scale-95', 'opacity-0');
+                    fCard.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+        }
+
+        function repeatCurrentLevel() {
+            playSound('click');
+            const fModal = document.getElementById('levelFailedModal');
+            const fCard = document.getElementById('levelFailedCard');
+
+            fCard.classList.remove('scale-100', 'opacity-100');
+            fCard.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                fModal.classList.add('hidden');
+                state.questionIndex = 0;
+                state.levelCorrectCount = 0;
+                loadQuestion();
+            }, 200);
+        }
+
+        function continueToNextLevel() {
+            playSound('click');
+            const lModal = document.getElementById('levelCompleteModal');
+            const lCard = document.getElementById('levelCompleteCard');
+
+            lCard.classList.remove('scale-100', 'opacity-100');
+            lCard.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                lModal.classList.add('hidden');
+
+                if (state.currentLevel < 5) {
+                    state.currentLevel++;
+                    state.questionIndex = 0;
+                    state.levelCorrectCount = 0;
+                    loadQuestion();
+                } else {
+                    finishGrandGame();
+                }
+            }, 200);
+        }
+
+        function finishGrandGame() {
+            playSound('megaWin');
+            
+            const end = Date.now() + 3.5 * 1000;
+            const frame = () => {
+                confetti({ particleCount: 6, angle: 60, spread: 60, origin: { x: 0 } });
+                confetti({ particleCount: 6, angle: 120, spread: 60, origin: { x: 1 } });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            };
+            frame();
+
+            document.getElementById('screenGame').classList.add('hidden');
+            document.getElementById('screenResult').classList.remove('hidden');
+
+            document.getElementById('resultPlayerName').innerText = `Selamat, ${state.playerName}!`;
+            document.getElementById('finalScore').innerText = state.score;
+
+            const accuracy = Math.round((state.totalCorrectCount / 50) * 100);
+            document.getElementById('finalAccuracy').innerText = `${accuracy}%`;
+
+            const vaultContainer = document.getElementById('treasuresVault');
+            vaultContainer.innerHTML = '';
+            state.collectedTreasures.forEach((item, idx) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "bg-white p-2.5 rounded-2xl border-2 border-yellow-400 flex flex-col items-center justify-center shadow transform hover:scale-105 transition";
+                itemDiv.innerHTML = `
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 border border-amber-300 flex items-center justify-center text-2xl mb-1">
+                        <i class="${item.icon}"></i>
+                    </div>
+                    <span class="text-[10px] font-black text-amber-900 leading-tight">Lvl ${idx + 1}</span>
+                    <span class="text-[9px] text-slate-600 font-bold truncate w-full">${item.name}</span>
+                `;
+                vaultContainer.appendChild(itemDiv);
+            });
+        }
+
+        function restartGame() {
+            playSound('click');
+            document.getElementById('screenResult').classList.add('hidden');
+            document.getElementById('screenWelcome').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
